@@ -1,0 +1,24 @@
+{
+  "name": "buff-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BhavsarJay/Buff-Scraper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BhavsarJay/Buff-Scraper/issues"
+  },
+  "homepage": "https://github.com/BhavsarJay/Buff-Scraper#readme",
+  "dependencies": {
+    "puppeteer": "^13.5.1"
+  }
+}
