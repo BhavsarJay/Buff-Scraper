@@ -1,7 +1,9 @@
 const pageScraper = require("./pageScraper");
+const pagePool = require("./pagePool");
+
 async function pageController(browserInstance) {
   let browser;
-  let pageNo = 1;
+  let pageNo = 840;
   const url =
     "https://buff.163.com/market/dota2#tab=selling&min_price=0&max_price=10&page_num=";
 
@@ -12,12 +14,43 @@ async function pageController(browserInstance) {
   }
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  await delay(1000 * 10);
+  // await delay(1000 * 1);
   // log into steam
   await steam_login(browser);
 
-  while (pageNo <= 1) {
-    await pageScraper(browser, url + pageNo);
+  // Open n pages
+  for (let i = 0; i < 10; i++) {
+    let page = await browser.newPage();
+
+    // Disable Css and images
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      if (
+        req.resourceType() == "stylesheet" ||
+        req.resourceType() == "font" ||
+        req.resourceType() == "image"
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+
+    pagePool.addToPool(page);
+  }
+
+  // Start Scraping pages
+  while (pageNo <= 1700) {
+    var page = null;
+    while (page == null) {
+      await delay(200);
+      pagePool.getFromPool().then((result) => {
+        page = result;
+      });
+      // if(page != null)
+    }
+    pageScraper(page, url + pageNo);
+
     pageNo++;
   }
 }
@@ -33,8 +66,12 @@ async function steam_login(browser) {
     await page.close();
   }
   await page.click("#imageLogin");
-  await page.waitForTimeout(1000 * 5);
+  await page.waitForTimeout(1000 * 3);
   await page.close();
 }
 
-module.exports = (browserInstance) => pageController(browserInstance);
+module.exports = {
+  pageController: function (browserInstance) {
+    pageController(browserInstance);
+  },
+};

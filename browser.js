@@ -13,9 +13,7 @@ async function startBrowser() {
         "C:\\Users\\HP\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data",
       defaultViewport: null,
       ignoreDefaultArgs: ["--disable-extensions"],
-      args: [
-        `--load-extension=${vpnPath}`,
-      ],
+      // args: [`--load-extension=${vpnPath}`],
     });
   } catch (err) {
     console.log("Could not create a browser instance => : ", err);

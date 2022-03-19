@@ -1,16 +1,23 @@
-async function scraper(browser, url) {
+const writer = require("./convertor");
+const pagePool = require("./pagePool");
+
+async function scraper(page, url) {
   // Goto buff page
-  let page = await browser.newPage();
   console.log(`Navigating to ${url}...`);
-  await page.goto(url);
-  // await page.setViewport({
-  //   width: 1500,
-  //   height: 700,
-  //   devicePixelRatio: 1.25,
-  // });
+
+  try {
+    await page.goto(url);
+    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+  } catch (e) {
+    await page.close();
+    return;
+  }
 
   // Wait for the required DOM to be rendered
   await page.waitForSelector("#j_list_card");
+  // await page.waitForNavigation({
+  //   waitUntil: "networkidle0",
+  // });
 
   let items = await page.$$eval("ul.card_dota2 > li", (items) => {
     // Extract the links from the data
@@ -18,19 +25,18 @@ async function scraper(browser, url) {
       const obj = new Object();
       obj.name = item.querySelector("h3 > a").innerHTML;
       obj.price = item.querySelector("p > strong").innerText;
-      return JSON.stringify(obj);
+      obj.buff_listings = item.querySelector("p > span").innerText;
+      console.log(obj);
+      return obj;
+      // return JSON.stringify(obj);
     });
   });
 
-  nextPageLink = await page.$eval(
-    "#j_market_card > .pager > ul > li:last-child a",
-    (el) => el.href
-  );
+  console.log(`Uploading Data for ${url.slice(71)}`);
+  writer(items, true);
 
-  console.log(items);
-  console.log(items.length + " items on this page");
-
-  page.close();
+  // Add page to pool
+  pagePool.addToPool(page);
 }
 
-module.exports = (browser, url) => scraper(browser, url);
+module.exports = (page, url) => scraper(page, url);
