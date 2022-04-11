@@ -3,7 +3,7 @@ const pagePool = require("./pagePool");
 
 async function pageController(browserInstance) {
   let browser;
-  let pageNo = 840;
+  let pageNo = 863;
   const url =
     "https://buff.163.com/market/dota2#tab=selling&min_price=0&max_price=10&page_num=";
 
@@ -14,27 +14,34 @@ async function pageController(browserInstance) {
   }
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  // let testpage = await browser.newPage();
+  // testpage.goto(
+  //   "https://buff.163.com/market/dota2#tab=selling&min_price=0&max_price=10&page_num=1"
+  // );
+  // return;
+
   // await delay(1000 * 1);
   // log into steam
   await steam_login(browser);
 
   // Open n pages
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 3; i++) {
     let page = await browser.newPage();
 
     // Disable Css and images
-    await page.setRequestInterception(true);
-    page.on("request", (req) => {
-      if (
-        req.resourceType() == "stylesheet" ||
-        req.resourceType() == "font" ||
-        req.resourceType() == "image"
-      ) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
+    // await page.setRequestInterception(true);
+    // page.on("request", (req) => {
+    //   if (
+    //     req.resourceType() == "stylesheet" ||
+    //     req.resourceType() == "font" ||
+    //     req.resourceType() == "image"
+    //   ) {
+    //     req.abort();
+    //   } else {
+    //     req.continue();
+    //   }
+    // });
 
     pagePool.addToPool(page);
   }
@@ -42,8 +49,10 @@ async function pageController(browserInstance) {
   // Start Scraping pages
   while (pageNo <= 1700) {
     var page = null;
+
+    console.log("Waiting to get a page...");
     while (page == null) {
-      await delay(200);
+      await delay(2000);
       pagePool.getFromPool().then((result) => {
         page = result;
       });

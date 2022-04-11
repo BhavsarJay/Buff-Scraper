@@ -19,9 +19,8 @@ async function writeToCSV(jsonArr, append) {
   });
 
   // Writerecords function to add records
-  csvWriter
-    .writeRecords(jsonArr)
-    .then(() => console.log("Data uploaded into csv successfully"));
+  csvWriter.writeRecords(jsonArr);
+  // .then(() => console.log("Data uploaded into csv successfully"));
 }
 
 module.exports = (arr, append) => writeToCSV(arr, append);
